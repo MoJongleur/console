@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 import styled from 'styled-components';
 import {
   blueColor_01,
@@ -9,15 +9,16 @@ import {
   JSONButtonNormal,
   NormalButton,
   whiteColor,
-} from 'src/helpers/commonStyles';
+} from '../helpers/commonStyles';
 
 import IsJsonString from '../helpers/IsJsonString';
 
 import ConsoleBlock from '../components/console/ConsoleBlock';
-import History from '../components/history/index';
-import {jsonStructureFailure, resetFailure} from 'src/store/actions';
-import {jsonPoke} from 'src/store/actions/json';
-import Header from 'src/components/header';
+import History from '../components/history';
+import {jsonStructureFailure, resetFailure} from '../store/actions/error';
+import {jsonPoke} from '../store/actions/json';
+import Header from '../components/header';
+import {RootState} from '../store';
 
 const HeaderWrapper = styled.div`
   height: 50px;
@@ -96,11 +97,21 @@ const JsonPrettyButton = styled.div`
   }
 `;
 
-function ConsolePage({history}) {
+export interface JsonEditor {
+  jsonEditor: {
+    setText: (data: string) => void;
+    set: (data: string) => void;
+    getText: () => string;
+    get: () => string;
+  },
+  value: string
+}
+
+function ConsolePage ({history}: RouteComponentProps) {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => !!state.auth.sessionKey?.length);
-  const json = useSelector((state) => state.json.responses);
-  const textArea = useRef();
+  const isLoggedIn = useSelector((state: RootState) => !!state.auth.sessionKey?.length);
+  const json = useSelector((state: RootState) => state.json.responses);
+  const textArea = useRef<JsonEditor>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -108,35 +119,41 @@ function ConsolePage({history}) {
     }
   }, [isLoggedIn]);
 
-  const replyPoke = (data) => {
-    textArea.current.value = JSON.stringify(data, null, '\t');
-    dispatch(
-      jsonPoke({value: textArea.current.value, json})
-    );
-  };
-
-  const handleClick = () => {
-    if(IsJsonString(textArea.current.value)) {
+  const replyPoke = (data: string) => {
+    if(textArea.current) {
+      textArea.current.jsonEditor.setText(JSON.stringify(data, null, '\t'));
       dispatch(
-        jsonPoke({value: textArea.current.value, json})
-      );
-    } else {
-      dispatch(
-        jsonStructureFailure()
+        jsonPoke({value: textArea.current.jsonEditor.getText(), json})
       );
     }
   };
 
+  const handleClick = () => {
+    if(textArea.current) {
+      if (IsJsonString(textArea.current.jsonEditor.getText())) {
+        dispatch(
+          jsonPoke({value: textArea.current.jsonEditor.getText(), json})
+        );
+      } else {
+        dispatch(
+          jsonStructureFailure()
+        );
+      }
+    }
+  };
+
   const handleJsonPretty = () => {
-    if(IsJsonString(textArea.current.value)) {
-      textArea.current.value = JSON.stringify(JSON.parse(textArea.current.value), null, '\t')
-      dispatch(
-        resetFailure()
-      );
-    } else {
-      dispatch(
-        jsonStructureFailure()
-      );
+    if(textArea.current) {
+      if (IsJsonString(textArea.current.jsonEditor.getText())) {
+        textArea.current.jsonEditor.setText(JSON.stringify(JSON.parse(textArea.current.jsonEditor.getText()), null, '\t'));
+        dispatch(
+          resetFailure()
+        );
+      } else {
+        dispatch(
+          jsonStructureFailure()
+        );
+      }
     }
   };
 

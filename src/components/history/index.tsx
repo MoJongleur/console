@@ -1,9 +1,11 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import styled from 'styled-components';
-import Element from 'src/components/history/children';
-import {jsonClear} from 'src/store/actions';
-import {grayColor_02, grayColor_03} from 'src/helpers/commonStyles';
+import Element from '../../components/history/children';
+import {jsonClear} from '../../store/actions/json';
+import {grayColor_02, grayColor_03} from '../../helpers/commonStyles';
+import {RootState} from '../../store';
+import {JsonElement} from '../../store/reducers/json';
 
 const ClearHistoryBlock = styled.div`
   height: 100%;
@@ -28,26 +30,33 @@ const HeaderWrapper = styled.div`
   align-items: center;
   display: flex;
   position: relative;
-  
   overflow-x: hidden;
   height: 500px;
 `;
 
-export default function History({replyPoke}) {
+interface Props {
+  replyPoke: (data: string) => void;
+}
+
+export default function History({replyPoke}: Props) {
   const dispatch = useDispatch();
-  const json = useSelector((state) => state.json);
-  const wheelRef = useRef();
+  const json = useSelector((state: RootState) => state.json);
+  const wheelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    wheelRef.current.addEventListener('wheel', event => {
-      const toLeft  = event.deltaY < 0 && wheelRef.current.scrollLeft > 0;
-      const toRight = event.deltaY > 0 && wheelRef.current.scrollLeft < wheelRef.current.scrollWidth - wheelRef.current.clientWidth;
+    if(wheelRef.current) {
+      wheelRef.current.addEventListener('wheel', event => {
+        if(wheelRef.current) {
+          const toLeft = event.deltaY < 0 && wheelRef.current.scrollLeft > 0;
+          const toRight = event.deltaY > 0 && wheelRef.current.scrollLeft < wheelRef.current.scrollWidth - wheelRef.current.clientWidth;
 
-      if (toLeft || toRight) {
-        event.preventDefault();
-        wheelRef.current.scrollLeft += event.deltaY
-      }
-    })
+          if (toLeft || toRight) {
+            event.preventDefault();
+            wheelRef.current.scrollLeft += event.deltaY
+          }
+        }
+      })
+    }
   }, []);
 
   const handleClear = () => {
@@ -61,7 +70,7 @@ export default function History({replyPoke}) {
   return (
     <>
       <HeaderWrapper ref={wheelRef}>
-        {responses.reverse().map((el, i) => (
+        {responses.reverse().map((el: JsonElement, i: number) => (
           <React.Fragment key={i}>
             <Element index={i} element={el} replyPoke={replyPoke}/>
           </React.Fragment>

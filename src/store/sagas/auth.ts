@@ -1,10 +1,16 @@
+// @ts-ignore
 import {all, put, call, takeLatest} from 'redux-saga/effects';
-import api from 'src/helpers/sendsay';
+import api from '../../helpers/sendsay';
 
-import {ActionTypes} from 'src/store/constants';
-import {authenticateSuccess, authenticateFailure} from 'src/store/actions/auth';
-import {loginFailure} from 'src/store/actions/error';
-import {resetFailure} from 'src/store/actions';
+import {ActionTypes} from '../constants';
+import {authenticateSuccess, authenticateFailure} from '../actions/auth';
+import {loginFailure} from '../actions/error';
+import {resetFailure} from '../actions';
+import {AuthPayload} from '../reducers/auth';
+
+interface Payload {
+  payload: AuthPayload
+}
 
 export function* authenticateCheckSaga() {
   try {
@@ -18,7 +24,7 @@ export function* authenticateCheckSaga() {
   }
 }
 
-export function* authenticateSaga({payload}) {
+export function* authenticateSaga({payload}: Payload) {
   yield put(resetFailure());
   sessionStorage.setItem('logError', '');
 
@@ -31,7 +37,7 @@ export function* authenticateSaga({payload}) {
     .then(() => {
       document.cookie = `sendsay_session=${api.sendsay.session}`;
     })
-    .catch((err) => {
+    .catch((err: {id: any, explain: any}) => {
       sessionStorage.setItem('logError', JSON.stringify({id: err.id, explain: err.explain}));
     });
 

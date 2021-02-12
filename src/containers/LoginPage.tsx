@@ -1,11 +1,13 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {RouteComponentProps, withRouter} from 'react-router-dom';
 import styled, {keyframes} from 'styled-components';
 import { Form, Field } from 'react-final-form'
 
 import {authenticate} from '../store/actions/auth';
 import {grayColor_01, NormalButton, redColor, whiteColor} from '../helpers/commonStyles';
+import {RootState} from '../store';
+import {AuthPayload} from '../store/reducers/auth';
 
 const Wrapper = styled.div`
   height: 100%;
@@ -130,16 +132,16 @@ const Loader = styled.svg`
   transform: translate(-50%, -50%);
 `;
 
-const required = (value) => (value ? undefined : 'Required');
-const password = (value) => (/^[a-zA-Z_0-9][a-zA-Z_0-9\s][^\s]*$/g.test(value) ? undefined : true);
-const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
+const required = (value: string) => (value ? undefined : 'Required');
+const password = (value: string) => (/^[a-zA-Z_0-9][a-zA-Z_0-9\s][^\s]*$/g.test(value) ? undefined : true);
+const composeValidators = (...validators: any) => (value: string) =>
+  validators.reduce((error:any, validator:any) => error || validator(value), undefined)
 
-function LoginPage({history}) {
+function LoginPage({history}: RouteComponentProps) {
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.auth.loading);
-  const isLoggedIn = useSelector((state) => !!state.auth.sessionKey?.length);
-  const error = useSelector((state) => state.error.loginError);
+  const loading = useSelector((state: RootState) => state.auth.loading);
+  const isLoggedIn = useSelector((state: RootState) => !!state.auth.sessionKey?.length);
+  const error = useSelector((state: RootState) => state.error.loginError);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -147,20 +149,20 @@ function LoginPage({history}) {
     }
   }, [isLoggedIn]);
 
-  const doLogin = (values) => {
+  const doLogin = (values: AuthPayload) => {
     dispatch(
       authenticate(values)
     );
   };
 
-  function onSubmit(values) {
+  function onSubmit(values: AuthPayload) {
     doLogin(values);
   }
 
   return (
     <Wrapper>
       <LogoStyled src="/icons/logo.svg" alt="" />
-      <FormSection action="/">
+      <FormSection>
         <ApiLogo>API-Консолька</ApiLogo>
         {
           error ?

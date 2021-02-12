@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import styled, {css, keyframes} from 'styled-components';
-import {jsonDelete} from 'src/store/actions';
+import {jsonDelete} from '../../../store/actions/json';
 import {useDispatch} from 'react-redux';
-import {grayColor_02, whiteColor} from 'src/helpers/commonStyles';
+import {grayColor_02, whiteColor} from '../../../helpers/commonStyles';
+import {JsonElement} from '../../../store/reducers/json';
 
 const ElementOfHistory = styled.div`
   height: 30px;
@@ -116,11 +117,17 @@ const CopyBlock = styled.div`
   ${StyledDiv}
 `;
 
-export default function Element({index, element, replyPoke}) {
+interface Props {
+  index: number;
+  element: JsonElement;
+  replyPoke: (data: string) => void;
+}
+
+export default function Element({index, element, replyPoke}: Props) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dispatch = useDispatch();
 
-  const [copyElem, setCopyElem] = useState(null);
+  const [copyElem, setCopyElem] = useState<JSX.Element | null>(null);
 
   const handleDo = () => {
     replyPoke(element.query);
@@ -130,7 +137,7 @@ export default function Element({index, element, replyPoke}) {
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(element.query, null, '\t'));
 
-    const elem = <CopyBlock>Скопировано</CopyBlock>;
+    const elem: JSX.Element = <CopyBlock>Скопировано</CopyBlock>;
     setCopyElem(elem);
     setTimeout(() => {setCopyElem(null)}, 2500);
     setDropdownVisible(false);
@@ -138,16 +145,18 @@ export default function Element({index, element, replyPoke}) {
 
   const handleDelete = () => {
     dispatch(
-      jsonDelete(index)
+      jsonDelete({count: index})
     );
     setDropdownVisible(false)
   };
+
+  const Text = Object.values(element.query)[0];
 
   return (
     <ElementOfHistory>
       <StatusOfElement src={element.error ? '/icons/ellipse_red.svg' : '/icons/ellipse_green.svg'} alt=""/>
       <TextOfElement>
-        {Object.values(element.query)[0]}
+        {Text}
       </TextOfElement>
       {copyElem}
       <UlTest onMouseEnter={ () => { setDropdownVisible(true) }}

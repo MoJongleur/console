@@ -1,10 +1,19 @@
+// @ts-ignore
 import {all, put, takeLatest} from 'redux-saga/effects';
-import api from 'src/helpers/sendsay';
+import api from '../../helpers/sendsay';
 
-import {ActionTypes} from 'src/store/constants';
-import {jsonError, jsonSuccess, resetFailure} from 'src/store/actions';
+import {ActionTypes} from '../constants';
+import {jsonError, jsonSuccess, resetFailure} from '../actions';
+import {JsonElement} from '../reducers/json';
 
-export function* jsonPoke({payload}) {
+interface Payload {
+  payload: {
+    json: Array<JsonElement>;
+    value: string;
+  }
+}
+
+export function* jsonPoke({payload}: Payload) {
   yield put(resetFailure());
 
   const idx = payload.json.findIndex(el => Object.values(el.query)[0] === Object.values(JSON.parse(payload.value))[0] );

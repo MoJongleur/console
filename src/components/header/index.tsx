@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
 import {useDispatch, useSelector} from 'react-redux';
-import {logout} from 'src/store/actions';
-import {QuitButtonNormal} from 'src/helpers/commonStyles';
+import {logout} from '../../store/actions/auth';
+import {QuitButtonNormal} from '../../helpers/commonStyles';
+import {RootState} from '../../store';
 
 const LogoContainer = styled.div`
   display: flex;
@@ -41,7 +42,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const [fullScreen, setScreen] = useState(false);
 
-  const auth = useSelector((state) => state.auth);
+  const auth = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
     dispatch(
@@ -55,29 +56,11 @@ export default function Header() {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       }
-      else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      }
-      else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-      else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
     } else {
       const docElm = document.documentElement;
 
       if (docElm.requestFullscreen) {
         docElm.requestFullscreen();
-      }
-      else if (docElm.mozRequestFullScreen) {
-        docElm.mozRequestFullScreen();
-      }
-      else if (docElm.webkitRequestFullScreen) {
-        docElm.webkitRequestFullScreen();
-      }
-      else if (docElm.msRequestFullscreen) {
-        docElm.msRequestFullscreen();
       }
     }
     setScreen(!fullScreen)

@@ -1,15 +1,21 @@
 import {handleActions} from 'redux-actions';
 
-import {ActionTypes} from 'src/store/constants';
+import {ActionTypes} from '../constants';
 
-export const initialState = {
+export interface ErrorProps {
+  loginError: boolean | null;
+  jsonErrorRequest: boolean | null;
+  jsonErrorStructure: boolean | null;
+}
+
+export const initialState: ErrorProps = {
   loginError: null,
   jsonErrorRequest: null,
   jsonErrorStructure: null
 };
 
 export default {
-  error: handleActions(
+  error: handleActions<ErrorProps, boolean>(
     {
       [ActionTypes.LOGIN_FAILURE]: (state, {payload}) => {
         return {
