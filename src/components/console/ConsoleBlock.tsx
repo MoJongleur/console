@@ -12,6 +12,10 @@ import {RootState} from '../../store';
 import { JsonEditor as Editor } from 'jsoneditor-react';
 import {JsonEditor} from '../../containers/ConsolePage';
 
+interface FieldProps {
+  width: number;
+}
+
 const InputMixinStyle = {
   boxSizing: 'border-box',
   borderRadius: '5px',
@@ -31,8 +35,11 @@ const ContentDrag = styled.img`
   cursor: col-resize;
 `;
 
-const InputWrapperLeft = styled.div<{width:number}>`
-  width: calc(50% + ${(props: {width: number}) => props.width}px);
+const InputWrapperLeft = styled.div.attrs<FieldProps>((props: FieldProps) => ({
+  style: {
+    width: `calc(50% + ${props.width}px)`,
+  },
+}))<FieldProps>`
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -43,8 +50,11 @@ const InputWrapperLeft = styled.div<{width:number}>`
   }
 `;
 
-const InputWrapperRight = styled.div<{width:number}>`
-  width: calc(50% - ${(props: {width: number}) => window.innerWidth/2 - props.width < 35 ? window.innerWidth/2-35 : props.width}px);
+const InputWrapperRight = styled.div.attrs<FieldProps>((props: FieldProps) => ({
+  style: {
+    width: `calc(50% - ${window.innerWidth/2 - props.width < 35 ? window.innerWidth/2-35 : props.width}px)`,
+  },
+}))<FieldProps>`
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -84,7 +94,7 @@ export default React.forwardRef((props: {}, ref: any) => {
     }
     prevCountRef.current = status;
     localStorage.setItem('widthWindow', String(size.x));
-  });
+  }, [status, size]);
 
   const handler = useCallback(() => {
     function onMouseMove(e: MouseEvent): void {
