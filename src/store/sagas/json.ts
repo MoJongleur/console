@@ -18,7 +18,7 @@ export function* jsonPoke({payload}: Payload) {
 
   const idx = payload.json.findIndex(el => Object.values(el.query)[0] === Object.values(JSON.parse(payload.value))[0] );
 
-  let newPayload = idx >= 0 ? payload.json.filter((el, i) => i != idx) : payload.json;
+  let newPayload = idx >= 0 ? payload.json.filter((el, i) => i !== idx) : payload.json;
   newPayload = newPayload.slice(0, 14);
 
   try {

@@ -1,5 +1,4 @@
 import React, {
-  ForwardedRef,
   useCallback,
   useEffect,
   useRef,
@@ -21,6 +20,12 @@ const InputMixinStyle = {
   zIndex: 1
 };
 
+const InputErrorMixinStyle = {
+  color: redColor,
+  border: `1px solid ${redColor}`,
+  boxShadow: '0px 0px 5px rgba(207, 44, 0, 0.5)'
+};
+
 const ContentDrag = styled.img`
   width: 10px;
   cursor: col-resize;
@@ -31,6 +36,11 @@ const InputWrapperLeft = styled.div<{width:number}>`
   display: flex;
   flex-direction: column;
   height: 100%;
+  
+  div .jsoneditor {
+    border: thin solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }
 `;
 
 const InputWrapperRight = styled.div<{width:number}>`
@@ -38,9 +48,14 @@ const InputWrapperRight = styled.div<{width:number}>`
   display: flex;
   flex-direction: column;
   height: 100%;
+  
+  div .jsoneditor {
+    border: thin solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }
 `;
 
-const InputLabel = styled.div`
+const InputLabel = styled.span`
   font-weight: 400;
   font-size: 12px;
   line-height: 20px;
@@ -64,7 +79,7 @@ export default React.forwardRef((props: {}, ref: any) => {
   const prevCountRef = useRef<string>(status);
 
   useEffect(() => {
-    if(status != prevCountRef.current && status === 'success' && responseRef.current != null) {
+    if(status !== prevCountRef.current && status === 'success' && responseRef.current != null) {
       responseRef.current.jsonEditor.setText(responses[0].response);
     }
     prevCountRef.current = status;
@@ -74,11 +89,9 @@ export default React.forwardRef((props: {}, ref: any) => {
   const handler = useCallback(() => {
     function onMouseMove(e: MouseEvent): void {
       e.preventDefault();
-      console.log(window.innerWidth)
       setSize(currentSize => ({
         x: currentSize.x + e.movementX
       }));
-      console.log(size)
     }
 
     function onMouseUp() {
@@ -109,7 +122,7 @@ export default React.forwardRef((props: {}, ref: any) => {
           onChange={handleChange}
           mainMenuBar={false}
           ref={ref}
-          htmlElementProps={{style: error ? {color: redColor, border: `1px solid ${redColor}`, boxShadow: '0px 0px 5px rgba(207, 44, 0, 0.5)', ...InputMixinStyle} : { ...InputMixinStyle, border: '1px solid rgba(0, 0, 0, 0.2)' }}}
+          htmlElementProps={{style: error ? {...InputErrorMixinStyle, ...InputMixinStyle} : { ...InputMixinStyle }}}
         />
       </InputWrapperLeft>
       <ContentDrag src="/icons/dots.svg" alt="" onMouseDown={handler} />
@@ -125,7 +138,7 @@ export default React.forwardRef((props: {}, ref: any) => {
           statusBar={false}
           mainMenuBar={false}
           ref={responseRef}
-          htmlElementProps={{style: responses.length > 0 && responses[0].error && responseRef.current && responseRef.current.jsonEditor.get() && status === "success" ? {color: redColor, border: `1px solid ${redColor}`, boxShadow: '0px 0px 5px rgba(207, 44, 0, 0.5)', ...InputMixinStyle } : { ...InputMixinStyle, border: '1px solid rgba(0, 0, 0, 0.2)' }}}
+          htmlElementProps={{style: responses.length > 0 && responses[0].error && responseRef.current && responseRef.current.jsonEditor.get() && status === "success" ? {...InputErrorMixinStyle, ...InputMixinStyle } : { ...InputMixinStyle }}}
         />
       </InputWrapperRight>
     </>
