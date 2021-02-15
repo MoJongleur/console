@@ -114,7 +114,7 @@ export default React.forwardRef((props: {}, ref: any) => {
         <InputLabel>Запрос:</InputLabel>
         <Editor
           mode="code"
-          value={ref.current}
+          value={ref.current || {"": ""}}
           enableSort={false}
           enableTransform={false}
           navigationBar={false}
