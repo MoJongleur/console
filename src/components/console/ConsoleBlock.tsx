@@ -37,7 +37,7 @@ const ContentDrag = styled.img`
 
 const InputWrapperLeft = styled.div.attrs<FieldProps>((props: FieldProps) => ({
   style: {
-    width: `calc(50% + ${props.width}px)`,
+    width: `calc(50% + ${props.width < (window.innerWidth/2-50) * -1 ? (window.innerWidth/2-50) * -1 : props.width}px)`,
   },
 }))<FieldProps>`
   display: flex;
@@ -52,7 +52,7 @@ const InputWrapperLeft = styled.div.attrs<FieldProps>((props: FieldProps) => ({
 
 const InputWrapperRight = styled.div.attrs<FieldProps>((props: FieldProps) => ({
   style: {
-    width: `calc(50% - ${window.innerWidth/2 - props.width < 35 ? window.innerWidth/2-35 : props.width}px)`,
+    width: `calc(50% - ${window.innerWidth/2 - props.width < 50 ? window.innerWidth/2-50 : props.width}px)`,
   },
 }))<FieldProps>`
   display: flex;
